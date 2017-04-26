@@ -5,8 +5,8 @@
     <description>Thoughts on Science &amp; Machine Learning.</description>
     <link>/</link>
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 26 Apr 2017 07:48:49 -0400</pubDate>
-    <lastBuildDate>Wed, 26 Apr 2017 07:48:49 -0400</lastBuildDate>
+    <pubDate>Wed, 26 Apr 2017 08:51:34 -0400</pubDate>
+    <lastBuildDate>Wed, 26 Apr 2017 08:51:34 -0400</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
@@ -361,32 +361,8 @@ to the reader to calculate the details, but it would exceed &lt;span&gt;​&lt;s
 &lt;p&gt;On your now very distressed kitchen table.&lt;/p&gt;
 </description>
         <pubDate>Mon, 24 Apr 2017 00:00:00 -0400</pubDate>
-        <link>/articles/17/2017-04-13-how-much-water-can-you-store-in-a-tesseract</link>
-        <guid isPermaLink="true">/articles/17/2017-04-13-how-much-water-can-you-store-in-a-tesseract</guid>
-        
-        
-        <category>physics</category>
-        
-        <category>math</category>
-        
-      </item>
-    
-      <item>
-        <title>A Brief Introduction to Information Geometry.</title>
-        <description>&lt;!--more--&gt;
-
-&lt;h2 id=&quot;flipping-a-biased-coin&quot;&gt;Flipping a Biased Coin&lt;/h2&gt;
-
-&lt;p&gt;&lt;label for=&quot;cubes&quot; class=&quot;margin-toggle&quot;&gt;⊕&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;cubes&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img class=&quot;fullwidth&quot; src=&quot;/assets/img/biased_coin.png&quot; /&gt;&lt;br /&gt;A biased coin. Such a thing does &lt;a href=&quot;http://www.stat.columbia.edu/~gelman/research/published/diceRev2.pdf&quot;&gt;not actually exist&lt;/a&gt;, but let’s suspend our disbelief for the duration of this discussion.&lt;/span&gt;&lt;/p&gt;
-
-&lt;p&gt;I have handed you a biased coin. The coin has an unknown probability,
-&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;p&lt;/script&gt;&lt;/span&gt;, of coming up &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;H=\text{HEADS}&lt;/script&gt;&lt;/span&gt;, and probability
-&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;(1-p)&lt;/script&gt;&lt;/span&gt; of coming up &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;T=\text{TAILS}&lt;/script&gt;&lt;/span&gt;.&lt;/p&gt;
-
-</description>
-        <pubDate>Thu, 13 Apr 2017 00:00:00 -0400</pubDate>
-        <link>/articles/17/2017-04-17-information-geometry</link>
-        <guid isPermaLink="true">/articles/17/2017-04-17-information-geometry</guid>
+        <link>/articles/17/how-much-water-can-you-store-in-a-tesseract</link>
+        <guid isPermaLink="true">/articles/17/how-much-water-can-you-store-in-a-tesseract</guid>
         
         
         <category>physics</category>
