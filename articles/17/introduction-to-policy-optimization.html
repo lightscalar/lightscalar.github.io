@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>A Practical Guide to Policy Optimization.</title>
+  <meta name="description" content="">
+
+  <!-- Google Fonts loaded here depending on setting in _data/options.yml true loads font, blank does not-->
+  
+  <link href='//fonts.googleapis.com/css?family=Lato:400,400italic' rel='stylesheet' type='text/css'>
+  
+
+  <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+  <link rel="stylesheet" type="text/css" href="/css/tufte.css">
+  <!-- <link rel="stylesheet" type="text/css" href="/css/print.css" media="print"> -->
+  <link rel="shortcut icon" href="/assets/img/ai-logo@2x.png" type="image/png"/>
+
+  <link rel="canonical" href="http://localhost:4000/articles/17/introduction-to-policy-optimization">
+
+  <link rel="alternate" type="application/rss+xml" title="Machine Learned" href="http://localhost:4000/feed.xml" />
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-98100846-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+</head>
+
+  <body>
+    <!--- Header and nav template site-wide -->
+<header>
+    <nav class="group">
+      <a href="/">
+	<img
+	class="badge"
+	src="/assets/img/ai-logo@2x.png"
+	alt="CH">
+      </a>
+      
+	
+      
+	
+	  
+	    <a href="/">Articles</a>
+	  
+	
+      
+	
+	  
+	    <a href="/page/"></a>
+	  
+	
+      
+	
+	  
+	    <a href="/about/">About</a>
+	  
+	
+      
+	
+	  
+	    <a href="/css/print.css"></a>
+	  
+	
+      
+	
+      
+    </nav>
+</header>
+
+    <article class="group">
+      <h1>A Practical Guide to Policy Optimization.</h1>
+<p class="subtitle">June 6, 2017</p>
+<hr class="slender">
+
+<!--more-->
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#resources">Resources</a></li>
+  <li><a href="#part-i-fundamentals">Part I: Fundamentals</a></li>
+  <li><a href="#markov-decision-processes">Markov Decision Processes</a></li>
+  <li><a href="#the-policy">The Policy</a></li>
+</ul>
+
+<h2 id="introduction">Introduction</h2>
+
+<p><label for="cubes" class="margin-toggle">⊕</label><input type="checkbox" id="cubes" class="margin-toggle" /><span class="marginnote"><img class="fullwidth" src="/assets/img/ian-small.gif" /><br />“Your scientists were so
+preoccupied with whether or not they could, they didn’t stop to think if they
+should.” — Ian Malcom. The simulation above is from the work of [<a href="https://arxiv.org/abs/1506.02438">Schulman, <em>et
+al.</em>, 2015</a>].</span></p>
+
+<p>Reinforcement learning is a branch of machine learning that answers the
+ambitious question: <em>How do we teach a machine to learn complex behaviors on
+its own, with limited supervision?</em> While reinforcement learning, or RL, has
+been around in one form or another for decades, in the last few years it’s made
+remarkable strides and is having something of a renaissance.</p>
+
+<p>Consider, as an example, the simulation to the right, which shows an autonomous
+spacecraft attempting to land between two flags on the lunar surface. The
+spacecraft is controlled by a neural network brain, which can take in various
+sensor readings subsequently fire the craft’s orientation engines or main
+thrusters. Its initial attempts are dismal: It careens wildly off-screen. It
+fires its thrusters haphazardly until it plows into the hard lunar soil. But
+after several iterations of its learning algorithm, we find it quite
+proficient: Not only does it land, but it does so deftly, and with panache.</p>
+
+<p>This behavior was not hard-coded by a human programmer — the RL agent learned
+it through experience: by trying and failing and getting a little bit better
+after each attempt. The only supervision involved was the numerical reward
+signal the authors provided at each timestep to let the robot know how well it
+was doing. In this case, the reward is simply the forward velocity of the
+robot<label for="actually" class="margin-toggle sidenote-number"></label><input type="checkbox" id="actually" class="margin-toggle" /><span class="sidenote">Actually the reward signal is a slightly more
+complicated than that. In addition to the forward velocity, the authors add a
+couple small terms designed to penalize large torques and impact forces.
+Defining a reward signal for a problem is something of an art, and how to do it
+best remains an open research question. </span>, the idea being that a properly
+walking robot should move faster than one flopping about on the ground. By
+slowly adapting its behavior in order to maximize some function of this reward,
+our bipedal friend learns how to coordinate its legs and arms in a complex and
+effective way. This ability to learn sophisticated behaviors with minimal
+oversight is among the great advantages of reinforcement learning.</p>
+
+<p>But let’s be a bit more precise about what is happening here. At each timestep
+of the simulation, <span>​<script type="math/tex">t</script></span>, our robot takes an action, <span>​<script type="math/tex">a_t</script></span>,
+selected from its list of available actions according to some plan that depends
+on its currently observed state, <span>​<script type="math/tex">s_t</script></span>. For the bipedal robot above,
+actions correspond to the application of certain torques and forces to its ten
+different joints. The state is a 22-dimensional vector recording the position
+and motion of the robot’s head, trunk, and extremeties. After taking an action,
+the robot receives a numerical reward <span>​<script type="math/tex">r_{t}</script></span>, and observes the next
+state, <span>​<script type="math/tex">s_{t+1}</script></span>. And so on.</p>
+
+<p>The goal of RL is to learn to maximize the total cumulative reward, also known
+as the <em>return</em>,</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">R=\sum_{t=0}^{\infty} r_{t}</script></div>
+
+<p>or something like it, by learning how to take the right action at the right
+time. Note that we’re maximizing the <em>cumulative</em>, not instantaneous reward.
+We’re interested in the long game, not short-term gains; this means that we may
+often have to do something suboptimal in the short-term to better achieve our
+long-term goals<label for="distal" class="margin-toggle sidenote-number"></label><input type="checkbox" id="distal" class="margin-toggle" /><span class="sidenote">And this touches on one of the chief
+challenges of RL: How do we know how to value an action when it might not bear
+fruit until the distant future? This thorny issue is known, variously, as the
+<em>credit assignment</em> or <em>distal reward</em> problem.  </span>.</p>
+
+<p>There are a lot of ways to skin this cat, and RL now comprises many techniques,
+including Monte Carlo, dynamic programming, policy optimization methods, and
+endless variants thereof. Each method has its strengths, weaknesses, and
+domains of applicability.</p>
+
+<p>In this article we explore the policy optimization approach, wherein our agent
+tries to directly learn the best policy, <span>​<script type="math/tex">\pi_\theta(a|s)</script></span>. The policy
+is the overarching plan, the strategy. It’s how the agent answers the question,
+<em>what action should I take, given I find myself in this particular state?</em>
+Think of it as the brain of the RL agent. More precisely, the policy tells us
+the likelihood that the agent should select an action, <span>​<script type="math/tex">a</script></span>, given it
+finds itself in a state, <span>​<script type="math/tex">s</script></span><label for="well" class="margin-toggle sidenote-number"></label><input type="checkbox" id="well" class="margin-toggle" /><span class="sidenote">For a stochastic
+policy, that is — which is what we consider here. We could also work with
+deterministic policies, where the action is not sampled from a distribution,
+but is the direct output of some function. </span>. The trick, or one of the tricks,
+anyway, is to somehow model this policy using a function approximator, then
+tinker with the approximation to increase the expected return.</p>
+
+<p>Note the subscript, which indicates the likelihood depends on a parameter
+vector <span>​<script type="math/tex">\theta</script></span>, the meaning of which depends on how we model
+<span>​<script type="math/tex">\pi_\theta</script></span>. If we’re using a neural network, which is what we’ll
+be doing here, then <span>​<script type="math/tex">\theta</script></span> maps to the weights and biases of the
+network<label for="itsbig" class="margin-toggle sidenote-number"></label><input type="checkbox" id="itsbig" class="margin-toggle" /><span class="sidenote">The size of this parameter vector depends on the
+size of the neural networks used to model the policy, but is typically large,
+containing hundreds if not thousands of parameters. This is part of what makes
+RL, and so-called deep-RL, in particular, so theoretically challenging and
+computationally intensive. </span>. In that case, the input to the network is the
+currently observed state vector, and its outputs are the probabilities of
+taking the next actions, which actions may be discrete or, as in the case of
+the bipedal robot, continuous. But much more on all that later. However we
+decide to model it, our goal is to somehow iteratively tweak <span>​<script type="math/tex">\theta</script></span>
+so that <span>​<script type="math/tex">\pi_\theta</script></span> produces the largest expected return. As we’ll
+see, some tweaks are better than others.</p>
+
+<p>This article divides into three parts: <a href="#part-i-fundamentals">Part I</a> defines
+the problem a bit more formally and introduces the simple RL problem we will
+use as an example thoughout; <a href="#part-ii-trust-region-policy-optimization">Part
+II</a> walks through an iterative
+method for optimizing the policy known as Trust Region Policy Optimization,
+which can efficiently solve a variety of RL problems; finally, <a href="#part-iii-implementation">Part
+III</a> shows how to practically implement the algorithm
+using the <a href="http://tensorflow.org">tensorflow</a> framework.</p>
+
+<p>Although we strive to be self-contained, we must assume the following of our
+intrepid reader: she is unafraid of linear algebra and vector calculus; she can
+compute gradients of multivariate functions for the purposes of optimization;
+she is familiar with basic probability theory; and she has fiddled, at least a
+bit, with simple neural networks of the multilayer perceptron variety. That
+said, as we sail forth we’ll recommend reviews and tutorials as necessary to
+help the despondent traveler.</p>
+
+<h2 id="resources-and-references">Resources and References</h2>
+
+<p>Excellent resources for learning about reinforcement learning abound. RL’s
+foundational text is arguably Barto &amp; Sutton’s <a href="https://goo.gl/BsydRB">Reinforcement Learning: An
+Introduction</a>, which provides an historical overview of
+the problem, an introduction to the fundamentals of temporal difference
+learning, Q-learning, and much more. David Silver’s <a href="http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html">notes from his
+lectures</a> at
+University College London provide an up-to-date perspective on these topics,
+and their modern extensions. John Schulman’s <a href="https://www.youtube.com/watch?v=2pWv7GOvuf0video">Introduction to Reinforcement
+Learning</a> lectures provide
+insights into many of the topics that we will discuss in this article, with an
+emphasis on Deep Reinforcement Learning.</p>
+
+<p>Indeed, the algorithms discussed here are based on two papers by Schulman and
+friends. The first is <a href="https://arxiv.org/abs/1502.05477">Trust Region Policy
+Optimization</a>, which introduces a practical
+method for robustly and efficiently solving the policy gradient problem. The
+second is <a href="https://arxiv.org/abs/1506.02438">High-Dimensional Continuous Control Using Generalized Advantage
+Estimation</a>, which shows how to use
+parameterized value functions to reduce the variance of policy gradient
+estimates while limiting the introduction of bias, and which technique,
+incidentally, was used to train our introductory lunar lander and bipedal
+walker. If none of this makes sense, well, read on, as these are the sorts of
+things we mean to clarify.</p>
+
+<p>Finally, the algorithms we develop in this article are available on
+<a href="http://www.github.com/lightscalar/dopamine">Github</a> for all your policy
+gradient optimizing needs.</p>
+
+<h1 id="part-i-fundamentals">Part I: Fundamentals</h1>
+
+<h2 id="markov-decision-processes">Markov Decision Processes</h2>
+
+<p>Before we talk in any detail about policy optimization, we need to more
+formally introduce the notion of a <em>Markov Decision Process</em>, or MDP, which is
+the mathematical language natural to reinforcement learning. MDPs comprise five
+major components: 1) a set of states, <span>​<script type="math/tex">\mathcal{S}</script></span>, that our system
+could be in; 2) a set of allowable actions, <span>​<script type="math/tex">\mathcal{A}</script></span><label for="discrete-or-continuous" class="margin-toggle"> ⊕</label><input type="checkbox" id="discrete-or-continuous" class="margin-toggle" /><span class="marginnote">These sets of actions and states could be discrete or
+continuous, depending on the problem. For what we’re doing here, they’ll be
+continuous. </span>; 3) a model of system dynamics, <span>​<script type="math/tex">T(s_{t+1}|s_t, a_t)</script></span>,
+which tells us the probability of transitioning from one state to the next
+given we’ve taken some action; 4) a scalar reward function, <span>​<script type="math/tex">r(s_t, a_t,
+s_{t+1}) \in \mathbb{R}</script></span>; and, finally, 5) some way to select the starting
+state, <span>​<script type="math/tex">s_0</script></span>.</p>
+
+<p>Let’s consider that fifth element first, because, well, before anything else
+can happen, we must know the initial state of our MDP. For some scenarios,
+<span>​<script type="math/tex">s_0</script></span> is deterministic — a chess board, for example, is always in the
+same state at the beginning of a game. For other scenarios, the starting state
+may be different every time, as when training an autonomous vehicle to drive
+through a city — every training episode will look different, with different
+cars, traffic patterns and densities, etc. In that case, we draw our initial
+state from a probability distribution, <span>​<script type="math/tex">\rho_0</script></span>, which may be some
+known distribution over the parameters of our environment, if we’re simulating
+it in a computer, or may be realized by the real world itself.</p>
+
+<p>The set of states in an MDP, <span>​<script type="math/tex">\mathcal{S}</script></span>, must have the so-called
+<em>Markov Property</em>, by which we mean the system dynamics depend only on the
+current state, <span>​<script type="math/tex">s_t</script></span>, and not on any prior states, <span>​<script type="math/tex">s_0, s_1, ...,
+s_{t-1}</script></span>. In practice, this is not a stringent requirement. If we
+find our system depends on the last two states, <span>​<script type="math/tex">s_{t-1}</script></span> and
+<span>​<script type="math/tex">s_t</script></span>, for example, we can simply concatenate these to form a new
+state, <span>​<script type="math/tex">s_t^\prime = \text{concat}(s_t, s_{t-1})</script></span>, which does satisfy
+the Markov property.</p>
+
+<p>However we find ourselves in state <span>​<script type="math/tex">s_0</script></span>, the next thing we do is take
+some action <span>​<script type="math/tex">a_0</script></span>, and thereby transition to the state
+<span>​<script type="math/tex">s_{1}</script></span>, according to some probabilistic transition model,
+<span>​<script type="math/tex">s_{t+1} \sim T(s_{t+1}|s_t, a_t)</script></span><label for="tilde" class="margin-toggle sidenote-number"></label><input type="checkbox" id="tilde" class="margin-toggle" /><span class="sidenote">The ~ symbol
+here means <em>is distributed as</em>, by which we mean the quantity on the left of
+the ~ is randomly sampled from the probability distribution on its right. </span>.
+For all this effort we receive a scalar reward, <span>​<script type="math/tex">r_0 \in \mathbb{R}</script></span>.
+By repeating this process, we construct a <em>trajectory</em>, <span>​<script type="math/tex">(s_0, a_0, r_0,
+s_1, a_1, ...)</script></span>. The classic Markov Decision Process is illustrated below.</p>
+
+<figure><figcaption></figcaption><img src="/assets/img/mdp.png" /></figure>
+
+<p>The transition dynamics<label for="needtoknow" class="margin-toggle"> ⊕</label><input type="checkbox" id="needtoknow" class="margin-toggle" /><span class="marginnote">For RL, we do not
+necessarily need to have a model of the system dynamics. The agent can simply
+take an action, let the system evolve, and observe the resulting state and
+reward. It need not have a detailed model of its environment and how it
+interacts with it; this is known as model-free RL. Having a model can help
+accelerate learning in some cases, but because models are usually only
+approximations to what is really going on, it is often difficult to reliably
+train model-based RL agents. This tension between model-free and model-based RL
+is the source of much new research these days. </span> <span>​<script type="math/tex">T(s_{t+1}|s_t,
+a_t)</script></span> might be modeled by a computer simulation, as for the lunar lander
+animated above, or, in the case of a physical robot, by the actual physics
+governing our Universe. Either way, we keep sampling our trajectory until a
+terminal state is reached, which, depending on what we’re trying to accomplish,
+could happen after we’ve observed a preordained number of timesteps, when our
+robot falls over, or after our game is lost or won. The trajectory that results
+from these efforts constitutes an <em>episode</em><label for="epsiodes" class="margin-toggle sidenote-number"></label><input type="checkbox" id="epsiodes" class="margin-toggle" /><span class="sidenote">Of course,
+not all RL scenarios are episodic, having a well defined beginning and end.
+Scenarios such as stock trading or natural language processing may be
+continuous. For the most part, the methods discussed here can be adapted to
+continuous scenarios with little trouble. </span>.</p>
+
+<h2 id="the-policy">The Policy</h2>
+
+<p>One thing we’ve not discussed is how to select an action at each timestep. As
+mentioned in the introduction, this is the job of the policy, <span>​<script type="math/tex">\pi</script></span>.
+The policy is the overarching strategy or plan. It tells our agent how to act
+when it finds itself in a certain state. Solving an MDP means finding the
+policy <span>​<script type="math/tex">\pi</script></span> that maximizes the expected return, or some function
+thereof. The policy could be deterministic, in which case the action is the
+output of a function of the current state, <span>​<script type="math/tex">a_t = \pi(s_t)</script></span>; or
+stochastic, wherein the action is sampled from a probability distribution
+conditioned on the current state, <span>​<script type="math/tex">a_t \sim \pi(a_t|s_t)</script></span>. Here we
+focus on stochastic policies.</p>
+
+<p>Before we can do anything, however, we have to somehow realize our policy; that
+is, we must represent it mathematically. Because we do not <em>a priori</em> know
+what policy is best, we’ll need a flexible representation we can modify as we
+go along.</p>
+
+<p>There are many sensible ways to approximate functions<label for="funcapprox" class="margin-toggle sidenote-number"></label><input type="checkbox" id="funcapprox" class="margin-toggle" /><span class="sidenote">For an nice overview of function approximation in the context of RL, see
+Chapter 8 of <a href="https://goo.gl/BsydRB">Barto and Sutton</a>, or David Silver’s
+<a href="http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching_files/FA.pdf">sixth
+lecture</a>
+. </span>. For our purposes, we will use <a href="https://en.wikipedia.org/wiki/Multilayer_perceptron">multilayer
+perceptrons</a> (MLPs)<label for="neuralnets" class="margin-toggle sidenote-number"></label><input type="checkbox" id="neuralnets" class="margin-toggle" /><span class="sidenote">New to neural networks? Two great tutorials are
+available <a href="http://neuralnetworksanddeeplearning.com/about.html">here</a> and
+<a href="http://cs231n.github.io/neural-networks-case-study/">here</a>. </span>. MLPs are
+feed-forward artificial neural networks capable of representing complex,
+nonlinear functions. Despite their power, they are quite simple mathematically.
+Think of an MLP as a fancy function, <span>​<script type="math/tex">f</script></span>, a machine that takes in
+vector-valued input, <span>​<script type="math/tex">x\in\mathbb{R}^n</script></span>, transforms it in some way,
+and returns vector-valued output, <span>​<script type="math/tex">y\in\mathbb{R}^k</script></span>:</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">y = f(x)</script></div>
+
+<p>To be a little more concrete, let’s walk through a quick example of using an
+MLP to implement a policy. Suppose the state space of our MDP is
+four-dimensional, and we have two different continuous actions that we can take
+at each time instant. Then we could implement the policy using something like
+the neural network illustrated below:</p>
+
+<figure><figcaption>A multilayer perceptron. This
+artificial neural network converts a four-dimensional input (the four red
+circles at the bottom) into a two-dimensional output (green circles at the
+top), by way of a hidden-layer containing eight neurons (gray circles in the
+middle). Each line connecting two nodes represents a network weight — an
+element of one of the network's two connection matrices.</figcaption><img src="/assets/img/neural-network@2x.png" /></figure>
+
+<p>The red circles at the lowest level represent the numerical inputs to this
+network (here four, the dimension of our state space), which we represent
+mathematically as a <span>​<script type="math/tex">(1 \times 4)</script></span> dimensional matrix, <span>​<script type="math/tex">x=[x_1,
+x_2, x_3, x_4]</script></span>. These inputs are propagated into the hidden layer of the
+network by multiplying by a <span>​<script type="math/tex">(4\times 8)</script></span> dimensional connection
+matrix, <span>​<script type="math/tex">W_1</script></span>:</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">z_1 = xW_1</script></div>
+
+<p>Note that the <span>​<script type="math/tex">8</script></span> comes about because we happen to have eight neurons
+(or nodes) in our hidden layer. In practice, depending on the complexity of the
+problem we’re trying to address, we might have dozens or hundreds of neurons
+per hidden layer. In this case, the result is a <span>​<script type="math/tex">(1 \times 8)</script></span>
+dimensional matrix, <span>​<script type="math/tex">z_1</script></span>, which is the raw output of the middle
+layer, to which we next apply the so-called activation function,
+<span>​<script type="math/tex">\sigma_1</script></span>, to obtain the output of the hidden layer:</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">h_1 = \sigma_1(z_1) = \sigma_1(xW_1)</script></div>
+
+<p>There are many possible choices for the activation function. While a <a href="https://en.wikipedia.org/wiki/Activation_function">full
+discussion</a> is beyond the
+scope of this article, popular choices include
+<a href="https://en.wikipedia.org/wiki/Sigmoid_function">sigmoid</a>, <span>​<script type="math/tex">\tanh</script></span>,
+and <a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks)">RELU</a>
+operations. Different activation functions offer different levels of
+performance on different problems, but their inclusion is non-negotiable: they
+introduce critical nonlinearities that allow neural networks, in principle at
+least, to approximate any function<label for="nonlinearities" class="margin-toggle sidenote-number"></label><input type="checkbox" id="nonlinearities" class="margin-toggle" /><span class="sidenote">Sans nonlinear
+activations, the output of the neural network becomes a simple matrix
+multiplication of its input; the problem thereby reduces to one of linear
+regression — which may be fine, but we will generally want to be able to
+express more complicated relationships. </span>.</p>
+
+<p>Finally, the output of the hidden layer is propagated to the output of the
+network via another matrix multiplication, and the application of a second
+activation function (which need not be the same as the first):</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">y = \sigma_2(z_2) = \sigma_2(h_1W_2) =
+\sigma_2(\sigma_1(xW_1)W_2) \tag{1}</script></div>
+
+<p>The <span>​<script type="math/tex">(8 \times 2)</script></span>-sized matrix <span>​<script type="math/tex">W_2</script></span> ensures that the output
+of the network is just two numbers, represented by a <span>​<script type="math/tex">(1 \times
+2)</script></span>-dimensional matrix. And that’s it: we’ve implemented a policy using a
+neural network! Given a state, <span>​<script type="math/tex">s_t\in\mathbb{R}^4</script></span>, we can process it
+using our network via Eq. 1, with <span>​<script type="math/tex">x = s_t</script></span>, to produce an output,
+<span>​<script type="math/tex">y</script></span>.</p>
+
+<p>Now, how do we interpret <span>​<script type="math/tex">y</script></span>? How does it correspond to the stochastic
+policy we’ve been discussing? It depends on how we’re modeling the underlying
+probability distribution from which we’re drawing our actions. A popular choice
+for continuous action spaces is to model the policy as a
+<span>​<script type="math/tex">K</script></span>-dimensional Gaussian with a fixed (generally diagonal) covariance,
+<span>​<script type="math/tex">\Sigma</script></span>. In that case, we interpret the output of the network as the
+mean of this distribution. To be completely explicit, our action is drawn from
+a <a href="https://en.wikipedia.org/wiki/Multivariate_normal_distribution">multivariate
+normal</a>
+distribution,</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">a_t \sim \mathcal{N}(y_t, \Sigma) \tag{2}</script></div>
+
+<p>where,</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">y_t = \sigma_2(\sigma_1(s_tW_1)W_2)</script></div>
+
+<p>At each timestep, we propagate the <span>​<script type="math/tex">s_t</script></span> through the MLP to obtain a
+mean action vector, <span>​<script type="math/tex">y_t</script></span>; we draw an action from a normal
+distribution with this mean according to Eq. 2; we take that action; we observe
+our new state and reward; and on and on.</p>
+
+<p>So we’re done, except for the small matter of finding the right policy. We’ve
+not said much about those weight matrices, <span>​<script type="math/tex">W_1</script></span>, and <span>​<script type="math/tex">W_2</script></span>.
+The matrices comprise the <span>​<script type="math/tex">(4 \times 8) + (8 \times 2) = 48</script></span>
+parameters of our network, and therefore define our policy. For convenience,
+rather than referring to the <span>​<script type="math/tex">W_1</script></span> and the <span>​<script type="math/tex">W_2</script></span> parameters
+separately, we will denote the full set of parameters specifying the network as
+<span>​<script type="math/tex">\theta</script></span>; you can regard <span>​<script type="math/tex">\theta</script></span> as the concatenation of all
+the elements of the weight matrices into one long vector and, indeed, when we
+actually implement these algorithms, this is exactly what we will do, for the
+sake of computational convenience and efficiency. For this example, then,
+<span>​<script type="math/tex">\theta \in \mathbb{R}^{48}</script></span>.</p>
+
+<p>We can now talk meaningfully about our <em>parameterized</em> policy,
+<span>​<script type="math/tex">\pi_\theta</script></span>, where the subscript indicates that the policy depends on
+(in the example here) a list of 48 numbers. Before training,
+<span>​<script type="math/tex">\theta</script></span> is typically initialized to random numbers near zero, a
+choice that will not, in general, yield an optimal policy. The goal of policy
+optimization is to somehow change <span>​<script type="math/tex">\theta</script></span> in response to states
+observed, actions taken, and rewards received, so that the policy ultimately
+performs well — in the sense that it generates a good return.</p>
+
+<p>But before we wade into those deep waters, a brief interlude: let’s introduce
+an example problem that will help make our discussion more concrete. While we
+could use an impressively difficult problem as our example, such scenarios are
+unnecessarily complicated when we’re trying to learn the basics, and can take a
+<em>long time</em> to train and simulate. So we’ll focus instead on a dead simple
+scenario, which can be trained in just a few minutes on a mediocre
+laptop<label for="restassured" class="margin-toggle sidenote-number"></label><input type="checkbox" id="restassured" class="margin-toggle" /><span class="sidenote">We should rest assured, however, that the
+methods introduced here are applicable to more complex, real-world
+problems. </span>.</p>
+
+<h1 id="part-ii-trust-region-policy-optimization">Part II: Trust Region Policy Optimization</h1>
+
+<p>The problem of teaching a machine to learn an optimal policy is frustrated by
+the long delay between actions and their positive or negative influence on
+rewards. This is known as the credit assignment problem<label for="distal_note" class="margin-toggle sidenote-number"></label><input type="checkbox" id="distal_note" class="margin-toggle" /><span class="sidenote">In the behavioral psychology literature, this is the notorious <a href="https://goo.gl/pI8Ls4">distal
+reward</a> problem. </span>.</p>
+
+<h1 id="part-iii-implementation">Part III: Implementation</h1>
+
+<p>So, how to implement TRPO efficiently?</p>
+
+
+
+    </article>
+    <span class="print-footer">A Practical Guide to Policy Optimization. - June 6, 2017 - Matthew J. Lewis</span>
+    <footer>
+  <hr class="slender">
+  <ul class="footer-links">
+    <li><a href="mailto:mlewis@michaero.com"><span class="icon-mail"></span></a></li>    
+    
+      <li>
+        <a href="//www.twitter.com/lightscalar"><span class="icon-twitter"></span></a>
+      </li>
+    
+      <li>
+        <a href="//github.com/lightscalar"><span class="icon-github"></span></a>
+      </li>
+      
+  </ul>
+<div class="credits">
+<span>&copy; 2018 &nbsp;&nbsp;MATTHEW J. LEWIS</span></br> <br>
+</div>  
+</footer>
+
+  </body>
+</html>

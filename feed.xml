@@ -3,11 +3,754 @@
   <channel>
     <title>Machine Learned</title>
     <description>Thoughts on Science &amp; Machine Learning.</description>
-    <link>/</link>
-    <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 26 Apr 2017 12:35:14 -0400</pubDate>
-    <lastBuildDate>Wed, 26 Apr 2017 12:35:14 -0400</lastBuildDate>
-    <generator>Jekyll v2.5.3</generator>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 09 Jan 2018 09:58:48 -0500</pubDate>
+    <lastBuildDate>Tue, 09 Jan 2018 09:58:48 -0500</lastBuildDate>
+    <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>A Discrete Approach to the Sum Over One Problem</title>
+        <description>&lt;!--more--&gt;
+
+&lt;h2 id=&quot;black-magic&quot;&gt;Black Magic&lt;/h2&gt;
+
+&lt;p&gt;Here is an astonishing true thing:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;The average number of samples that must be drawn from a uniform distribution
+on &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;[0,1]&lt;/script&gt;&lt;/span&gt; before their sum exceeds one is equal to
+Euler’s&lt;label for=&quot;napier&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;napier&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;Euler’s number, also know as Napier’s constant,
+was actually discovered by the Swiss mathematician Jacob Bernoulli during his
+studies of compound interest. It’s value is approximately 2.718281828. It is
+the basis of natural logarithms and curiously ubiquitous in mathematics. &lt;/span&gt;
+number, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;e&lt;/script&gt;&lt;/span&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;I first learned of this fact via a
+&lt;a href=&quot;https://twitter.com/fermatslibrary/status/924263998589145090&quot;&gt;Tweet&lt;/a&gt; from
+&lt;a href=&quot;https://twitter.com/fermatslibrary&quot;&gt;@fermatslibrary&lt;/a&gt;, and it was a genuine
+shock. How in the world does Euler’s number emerge, for no apparent reason, in
+response to this innocuous question of probability? Can this even be true? And
+if it is, as I. I. Rabi famously said&lt;label for=&quot;rabi&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;rabi&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;Rabi had other good,
+quotes, too: “My mother made me a scientist without ever intending to. Every
+other Jewish mother in Brooklyn would ask her child after school: So? Did you
+learn anything today? But not my mother. “Izzy,” she would say, “did you ask a
+good question today?” That difference — asking good questions — made me become
+a scientist.” &lt;/span&gt; of the discovery of the muon, “Who ordered that?!”.&lt;/p&gt;
+
+&lt;p&gt;And yet it is true, provably true, and somewhat well-known. Attached to that
+Tweet is an elegant (if terse) proof. Neal Grantham, who terms this the &lt;em&gt;sum
+over one&lt;/em&gt; problem, takes a &lt;a href=&quot;http://nsgrantham.com/sum-over-one&quot;&gt;rather more direct
+approach&lt;/a&gt;, but arrives at the same
+delightful conclusion.&lt;/p&gt;
+
+&lt;p&gt;These proofs do not fail to convince, but I find them somehow viscerally
+unsatisfying.  They offer little insight into why &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;e&lt;/script&gt;&lt;/span&gt; suddenly
+appears, in terms of anything else we know about &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;e&lt;/script&gt;&lt;/span&gt;. Of course
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;e&lt;/script&gt;&lt;/span&gt; assumes many guises, but it is perhaps most famously understood as
+the following limit&lt;label for=&quot;maor&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;maor&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;For an excellent overview of &lt;em&gt;e&lt;/em&gt;, I
+recommend &lt;a href=&quot;https://www.amazon.com/Story-Number-Eli-Maor/dp/0691058547&quot;&gt;e: The Story of a
+Number&lt;/a&gt;, by Eli
+Maor. The number has a rich and fascinating history, which touches the lives of
+many great mathematicians. &lt;/span&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;\lim_{n\rightarrow\infty}\left(1+\frac{1}{n}\right)^{n} \equiv
+e \tag{1}\label{edef}&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;The proofs above fail to inform me who ordered that.&lt;/p&gt;
+
+&lt;p&gt;So how does the &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;e&lt;/script&gt;&lt;/span&gt; of Eq. &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\ref{edef}&lt;/script&gt;&lt;/span&gt; make contact with our
+question of probability? I wondered if exploring a discrete version of the
+problem might demystify &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;e&lt;/script&gt;&lt;/span&gt;’s bolt-from-the-blue arrival. This article
+chronicles these explorations and provides a more organic&lt;label for=&quot;me&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;me&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;According to me. &lt;/span&gt; explanation for understanding of why &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;e&lt;/script&gt;&lt;/span&gt; is the
+obvious—or at least plausible—answer.&lt;/p&gt;
+
+&lt;h2 id=&quot;alea-iacta-est&quot;&gt;Alea Iacta Est&lt;/h2&gt;
+
+&lt;p&gt;Here is the discrete version of the game. We roll an &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt;-sided die
+until the cumulative sum of the throws exceeds &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt;. &lt;label for=&quot;dice&quot; class=&quot;margin-toggle&quot;&gt;⊕&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;dice&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img class=&quot;fullwidth&quot; src=&quot;/assets/img/cubic-dice.png&quot; /&gt;&lt;br /&gt;Dice. These dice have six sides each, but
+we’ll be considering here the more general problem of &lt;em&gt;n&lt;/em&gt;-sided dice.&lt;/span&gt; We
+ask, on average, how many times must we throw that die? This problem is at once
+easier to conceptualize than its continuous counterpart, because it is
+discrete, and much more difficult to actually calculate—because it is discrete.&lt;/p&gt;
+
+&lt;p&gt;Let &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;K&lt;/script&gt;&lt;/span&gt; be the random variable corresponding to the number of times we
+must throw the die until the sum of the throws first exceeds &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt;, the
+number of sides on the die. Ultimately we want to find the probability
+distribution &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;P(K=k \mid n)&lt;/script&gt;&lt;/span&gt; — the probability that the sum of our throws
+first exceeds &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt; after exactly &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;&lt;/span&gt; throws — because once we
+know this, computing the expected value of &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;&lt;/span&gt; is straightforward via
+the usual &lt;a href=&quot;https://en.wikipedia.org/wiki/Expected_value&quot;&gt;definition&lt;/a&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;\langle k \rangle_n = \sum_{k=2}^{n+1} k
+P(K=k \mid n)\tag{2}\label{expect}&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;Note the limits of summation: we’re running from &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;2&lt;/script&gt;&lt;/span&gt; to
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n+1&lt;/script&gt;&lt;/span&gt;. There is zero chance of exceeding &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt; on the first
+roll; the best we can do there is &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt; itself. On the other hand, the
+sum is guaranteed to exceed &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt; after &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;k = n+1&lt;/script&gt;&lt;/span&gt; rolls,
+because each roll generates, at minimum, a value of one&lt;label for=&quot;first-time&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;first-time&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;Note that although the probability of this sum exceeding &lt;em&gt;n&lt;/em&gt; on
+roll &lt;em&gt;n+1&lt;/em&gt; is unity, that’s not what we’re calculating. We’re calculating the
+probability that the sum &lt;em&gt;first&lt;/em&gt; exceeds &lt;em&gt;n&lt;/em&gt; on that roll, and not before,
+which will be less than one. &lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;R_i&lt;/script&gt;&lt;/span&gt; represent the random variable corresponding to the
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;i^{\text{th}}&lt;/script&gt;&lt;/span&gt; roll. The key to calculating &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;P(K=k \mid n)&lt;/script&gt;&lt;/span&gt;
+is to realize that it must equal the difference between the following
+probabilities:&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;P(K=k\mid n) = P(K\leq k\mid n) - P(K\leq k-1\mid n)
+\tag{3}\label{key}&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;But note that,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;P(K \leq k \mid n) = P\left(\sum_{i=1}^{k} R_i &gt; n \right) = 1 - P \left(
+\sum_{i=1}^{k} R_i \leq n \right)\tag{4} \label{complement} &lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;Using Eq. &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\ref{key}&lt;/script&gt;&lt;/span&gt; and Eq. &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\ref{complement}&lt;/script&gt;&lt;/span&gt;, we can
+write &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;P(K=k \mid n)&lt;/script&gt;&lt;/span&gt; as,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt; \begin{align} P(K=k \mid n) &amp;= [1 - P(K \leq k \mid n)] - [1 - P(K
+\leq k-1 \mid n)] \tag{5}\\ &amp;= P\left(\sum_{i=1}^{k-1} R_i \leq n\right) -
+P\left(\sum_{i=1}^{k} R_i\leq n\right)
+\tag{6}\label{prob_diff}\end{align}&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;And now we have only to calculate the probability that the sum of &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;&lt;/span&gt;
+throws is less than or equal to &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;counting-is-hard&quot;&gt;Counting Is Hard&lt;/h2&gt;
+
+&lt;p&gt;We assume that the &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;&lt;/span&gt; throws are independent events, so the
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n^k&lt;/script&gt;&lt;/span&gt; possible outcomes are equally likely. But to compute the
+probability, we must know, of these outcomes, how many satisfy &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\sum_i R_i
+\leq n&lt;/script&gt;&lt;/span&gt;? If we call this number &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;N_{\leq}(n,k)&lt;/script&gt;&lt;/span&gt;, then the
+probability is,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;P\left(\sum_i R_i \leq n \right) = \frac{N_{\leq}(n,
+k)}{n^k} \tag{7}\label{prob_div}&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;So the problem, then, is to compute &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;N_{\leq}(n,k)&lt;/script&gt;&lt;/span&gt; for arbitrary
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt; and &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;To find &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;N_{\leq}&lt;/script&gt;&lt;/span&gt;, let’s first answer a slightly easier question: how
+many outcomes will sum to exactly &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt; using &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;&lt;/span&gt; integers?&lt;/p&gt;
+
+&lt;p&gt;One way to attack this problem is to write out &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt; as the sum of
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt; ones (which sum is guaranteed, of course, to sum to &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt;),
+and then consider how many ways we can partition those ones into different
+groups. This is illustrated in the figure to the right, for the case of
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n=6&lt;/script&gt;&lt;/span&gt; and &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;k=2&lt;/script&gt;&lt;/span&gt;&lt;label for=&quot;partitions&quot; class=&quot;margin-toggle&quot;&gt;⊕&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;partitions&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img class=&quot;fullwidth&quot; src=&quot;/assets/img/partitions@2x.png&quot; /&gt;&lt;br /&gt;The number of ways we can sum to six via two
+positive integers is the number of ways we can select one plus sign from among
+the five plus signs in the equation 6 = 1 + 1 + 1 + 1 + 1 + 1, if we regard the
+selected plus sign as partitioning the sum into two pieces. The sum to the left
+of the selected plus sign represents one number, and the sum to the right of
+that plus sign represents the other. If we wanted to sum to exactly six using
+three numbers, we’d find the number of ways to select two plus signs from the
+five available; and so on.&lt;/span&gt;. It is easy to see that the partitioning is
+equivalent to asking, “How many ways can I select one plus sign from the five
+plus signs?” On the other hand, if we were to ask, how many ways are there to
+sum to six using three positive integers, we’d want to calculate how
+many ways we can select two plus signs from those five plus signs, and so
+forth. This question is answered, in general, using combinations.&lt;/p&gt;
+
+&lt;p&gt;Recall that a &lt;a href=&quot;https://en.wikipedia.org/wiki/Combination&quot;&gt;combination&lt;/a&gt; is a
+selection of items from a collection such that the order of the selection does
+not matter. The number of ways in which one may select &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;&lt;/span&gt; items from
+among &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt; available items is given by,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;\binom{n}{k} = \frac{n!}{k!(n - k)!}&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;By this argument we see that, in general, the number of ways we can sum to
+exactly &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt; using &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;&lt;/span&gt; positive integers, which we’ll denote
+as &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;N_{=}(n,k)&lt;/script&gt;&lt;/span&gt;, is given by,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;N_{=}(n,k)=\binom{n-1}{k-1}=\frac{(n-1)!}{(k-1)! (n - k +
+1)!},&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;Using a six-sided die, for example, the number of ways we can sum to six with
+two throws is given by,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;\binom{6-1}{2-1} = \binom{5}{1} = \frac{5!}{1!4!} = 5&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;Note that the five corresponds to the number of possibilities enumerated in the
+example to the right. This all seems to hang together.&lt;/p&gt;
+
+&lt;p&gt;But Eq. &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\ref{prob_div}&lt;/script&gt;&lt;/span&gt; requires the total number of outcomes whose
+sum is &lt;em&gt;less than or equal&lt;/em&gt; to &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt;. That number will
+equal the sum the the number of ways we can reach &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n^\prime&lt;/script&gt;&lt;/span&gt; for all
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;k \leq n^\prime \leq n&lt;/script&gt;&lt;/span&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;N_{\leq}(n,k) = \sum_{n^\prime=k}^{n} N_=(n^\prime,
+k) = \sum_{n^\prime=k}^{n} \binom{n^\prime-1}{k-1}=\binom{n}{k}&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;where in the last step we’ve used the so-called &lt;a href=&quot;https://en.wikipedia.org/wiki/Hockey-stick_identity&quot;&gt;hockey-stick
+identity&lt;/a&gt; of combinations.&lt;/p&gt;
+
+&lt;p&gt;This is a delightfully simple result&lt;label for=&quot;ubiquity&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;ubiquity&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;Delightful, but
+hardly surprising. Most interesting counting problems wend their way back to
+&lt;a href=&quot;https://en.wikipedia.org/wiki/Pascal%27s_triangle&quot;&gt;Pascal’s triangle&lt;/a&gt;
+eventually, it seems. &lt;/span&gt; that allows us to compute the probability of interest:&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;P\left(\sum_{i=1}^{k} R_i \leq n\right) = \frac{1}{n^k} \binom{n}{k}
+\tag{8} \label{less-than} &lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;And this, in turn, allows us to calculate the probability in Eq.
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\ref{prob_div}&lt;/script&gt;&lt;/span&gt;, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;P(K=k \mid n)&lt;/script&gt;&lt;/span&gt;. Using Eq.
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\ref{prob_diff}&lt;/script&gt;&lt;/span&gt; and &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\ref{less-than}&lt;/script&gt;&lt;/span&gt;,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;P(K=k) = \frac{1}{n^{k-1}} \binom{n}{k-1} - \frac{1}{n^k}
+\binom{n}{k} \tag{9} \label{k-is-k}&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;And now finally, we’re in a position to compute &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\langle k \rangle&lt;/script&gt;&lt;/span&gt;
+via Eq. &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\ref{expect}&lt;/script&gt;&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;But, well, after all these perambulations, we might wonder if we’ve made a
+mistake. In these cases, it is prudent to turn to numerical simulation to
+verify our analytic results. Let’s check our sanity by verifying Eq.
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\ref{k-is-k}&lt;/script&gt;&lt;/span&gt; by way of simulation. We do this by simulating our die
+throwing experiment in Python using a synthetic die with &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n=10&lt;/script&gt;&lt;/span&gt; sides,
+and compare the empirically measured probabilities with our theoretically
+calculated results, via Eq. &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\ref{k-is-k}&lt;/script&gt;&lt;/span&gt;. The results of this, for
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;10^6&lt;/script&gt;&lt;/span&gt; simulated rounds, is presented in the figure below:&lt;/p&gt;
+
+&lt;figure&gt;&lt;figcaption&gt;The probability that the sum of
+successive throws of a ten-sided die exceeds ten, after k throws. Note that
+the empirical measurements (blue bars) match theoretical predictions (red dots)
+quite well.&lt;/figcaption&gt;&lt;img src=&quot;/assets/img/distributions.png&quot; /&gt;&lt;/figure&gt;
+
+&lt;p&gt;Now that we’ve convinced ourselves that we are correctly computing the
+probability &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;P(K=k \mid n)&lt;/script&gt;&lt;/span&gt;, we are &lt;em&gt;finally&lt;/em&gt; in a position to
+calculate the expectation we’re after.&lt;/p&gt;
+
+&lt;h2 id=&quot;great-expectations&quot;&gt;Great Expectations&lt;/h2&gt;
+
+&lt;p&gt;Before computing &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\langle k \rangle&lt;/script&gt;&lt;/span&gt;, let’s rearrange Eq.
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\ref{k-is-k}&lt;/script&gt;&lt;/span&gt; to make it a bit simpler. Note that with a little
+algebra we can write,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;\binom{n}{k-1} = \frac{n!}{(k-1)!(n-k+1)!} =
+\frac{k}{(n-k+1)}\frac{n!}{k!(n-k)!}=\frac{k}{(n-k+1)}\binom{n}{k}&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;This allows us to write Eq. &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\ref{k-is-k}&lt;/script&gt;&lt;/span&gt;, with yet a bit more
+algebra, as,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;P(K=k \mid n) = \frac{n(k-1)+(k-1)}{n^k(n-k+1)} \binom{n}{k} &lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;Multiplying by &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;&lt;/span&gt; and summing, as per Eq. &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\ref{expect}&lt;/script&gt;&lt;/span&gt;, we
+obtain,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt; \langle k \rangle_n = \sum_{k=2}^{n+1}\frac{nk(k-1) + k(k-1)}
+{n^k(n-k+1)} \binom{n}{k} \tag{10}\label{answer}&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;And there we are. For a die with &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt; sides we can now compute the
+expected number of throws we’ll need to exceed &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt;. What do we expect
+for a six-sided die? For &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n=6&lt;/script&gt;&lt;/span&gt;, Eq. &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\ref{answer}&lt;/script&gt;&lt;/span&gt; yields,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt; \langle k \rangle_{n=6} = \frac{117649}{46656} \approx 2.522
+&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;a number that is decidedly not &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;e&lt;/script&gt;&lt;/span&gt;&lt;label for=&quot;ofcourse&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;ofcourse&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;Not that we’d
+expect it to be, of course; rational numbers tend never to be irrational. &lt;/span&gt;.
+But, interestingly, neither is it too far off. Let’s consider a die with
+more sides, say, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n=15&lt;/script&gt;&lt;/span&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt; \langle k \rangle_{n=15} =
+\frac{11152921504606846976}{437893890380859375} \approx 2.633 &lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;Even closer! Intrigued by these observations, let’s keep increasing the number
+of sides on our die. If we continue calculating the expectation for ever higher
+values of &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt;, we generate the following plot:&lt;/p&gt;
+
+&lt;figure&gt;&lt;figcaption&gt;The mean number of die throws
+required before sum of throws exceeds the number of sides on the die, as a
+function of the number of sides on the die. Note that this mean value seems
+to be converging.&lt;/figcaption&gt;&lt;img src=&quot;/assets/img/convergence.png&quot; /&gt;&lt;/figure&gt;
+
+&lt;p&gt;It appears that, as we let &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt; increase, the expected number of throws
+required for the sum to exceed &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt; converges to a number — and that
+number, empirically at least, appears to be &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;e&lt;/script&gt;&lt;/span&gt;. But can we prove it?
+Sure we can.&lt;/p&gt;
+
+&lt;p&gt;Let’s write out Eq. &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\ref{answer}&lt;/script&gt;&lt;/span&gt; in all its glory,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;\langle k \rangle_n = \sum_{k=2}^{n+1} \frac{n k(k-1) + k(k-1)}{n^k
+(n-k+1)} \frac{n!}{k!(n-k)!}&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;Now consider the case where &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n\gg k&lt;/script&gt;&lt;/span&gt;. The above expression simplifies,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt; \begin{align} \langle k \rangle_n &amp;\approx \sum_{k=2}^{n+1}
+\frac{k(k-1)}{n^k}\frac{n!}{k!(n-k)!} \\ &amp;= \sum_{k=2}^{n+1}\frac{n!}{n^k
+(k-2)! (n-k)!} \\ &amp;= \sum_{k=2}^{n+1}\frac{n! (n-k+2) (n-k+1)}{(k-2)!(n - k +
+2)!} \frac{1}{n^k} \\ &amp;\approx \sum_{k=2}^{n} \frac{n!}{(k-2)![n - (k-2)]!}
+\frac{1}{n^{k-2}} \end{align} &lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;And now note that we can change the lower limit of the summation; rather than
+starting at &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;k=2&lt;/script&gt;&lt;/span&gt;, we can start at &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;k=0&lt;/script&gt;&lt;/span&gt;, provided we replace
+all the &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;(k-2)&lt;/script&gt;&lt;/span&gt; terms that appear in our summand with &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;&lt;/span&gt;.
+Doing this we obtain,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;\langle k \rangle_n \approx \sum_{k=0}^{n} \frac{1}{n^k}
+\frac{n!}{k!(n-k)!} = \sum_{k=0}^{n} \frac{1}{n^k} \binom{n}{k} &lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;where, again, this holds for &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n \gg k&lt;/script&gt;&lt;/span&gt;. This may begin to look
+familiar. In particular, recall the &lt;a href=&quot;https://en.wikipedia.org/wiki/Binomial_theorem&quot;&gt;binomial
+theorem&lt;/a&gt;, which states that,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;(1+x)^n = \sum_{k=0}^n x^k \binom{n}{k} &lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;In our present situation, letting &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;x = 1/n&lt;/script&gt;&lt;/span&gt;, we can write our
+expectation as,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;\lim_{n \rightarrow \infty} \langle k \rangle_n = \lim_{n \rightarrow
+\infty} \sum_{k=0}^{n} \frac{1}{n^k} \binom{n}{k} = \lim_{n \rightarrow \infty}
+\left(1+ \frac{1}{n}\right)^n \equiv e&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;And we’ve recovered the definition of Euler’s number, &lt;em&gt;à la&lt;/em&gt; Eq.
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\ref{edef}&lt;/script&gt;&lt;/span&gt;!&lt;/p&gt;
+
+&lt;p&gt;Here is where I find &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;e&lt;/script&gt;&lt;/span&gt; emerge organically, in a sense. For all
+finite values of &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt;, the expectation is a rational number. But as the
+number of sides increases, the combinatorics of how the throws can sum to
+exceed &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt; evolves in just the right way such that—as &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt;
+gets really large—it starts to converge to the binomial expansion of
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;(1+1/n)^n&lt;/script&gt;&lt;/span&gt;, which in the limit turns out to be exactly the definition
+of &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;e&lt;/script&gt;&lt;/span&gt;. And for my part, at least, I can start to see a glimmer of an
+answer to that primal question: &lt;em&gt;who ordered that?&lt;/em&gt;&lt;label for=&quot;ofcourse&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;ofcourse&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;Of
+course, you might argue, the other proofs I’ve cited could be brought to this
+same point—the binomial expansion could ultimately be reconstructed from those
+calculations as well. Certainly, I’d agree, they must all be equivalent at some
+level, but seeing the binomial theorem emerge directly from the combinatorics
+of die throws and lead to the very definition of Euler’s constant makes me feel
+happy inside. &lt;/span&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;from-discrete-back-to-continuous&quot;&gt;From Discrete Back to Continuous&lt;/h2&gt;
+
+&lt;p&gt;As &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt; heads off to infinity, our discrete problem becomes equivalent
+to the original, continuous problem introduced at the start. To better see the
+equivalence, note we can map the discrete problem onto the unit interval, as in
+the following illustration.&lt;/p&gt;
+
+&lt;figure&gt;&lt;figcaption&gt;We can reconstruct our discrete
+die-throwing experiment on the unit interval by partitioning it into
+subintervals. As the number of subintervals approaches infinity—equivalent to
+our infinite sided die—we recover the uniform distribution we introduced
+about originally.&lt;/figcaption&gt;&lt;img src=&quot;/assets/img/real-line@2x.png&quot; /&gt;&lt;/figure&gt;
+
+&lt;p&gt;Rather than considering an &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt;-sided die, we partition the unit
+interval into &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;&lt;/span&gt; subintervals. At each step, we then sample a number
+uniformly from the interval &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;[0,1]&lt;/script&gt;&lt;/span&gt;, and select as our value the
+uppermost limit of whatever subinterval the sample falls into. We continue to
+select values in this manner until their sum exceeds one, just as in the
+original formulation of the problem—but now we’re working in the context of a
+discrete problem. And now, as &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;n \rightarrow \infty&lt;/script&gt;&lt;/span&gt;, discrete meets
+continuous, and by the arguments advanced above, we’ve proven the original
+assertion.&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 09 Jan 2018 00:00:00 -0500</pubDate>
+        <link>http://localhost:4000/articles/18/The-Sum-Over-M-Problem</link>
+        <guid isPermaLink="true">http://localhost:4000/articles/18/The-Sum-Over-M-Problem</guid>
+        
+        
+        <category>math</category>
+        
+        <category>physics</category>
+        
+      </item>
+    
+      <item>
+        <title>A Practical Guide to Policy Optimization.</title>
+        <description>&lt;!--more--&gt;
+
+&lt;h2 id=&quot;table-of-contents&quot;&gt;Table of Contents&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#resources&quot;&gt;Resources&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#part-i-fundamentals&quot;&gt;Part I: Fundamentals&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#markov-decision-processes&quot;&gt;Markov Decision Processes&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#the-policy&quot;&gt;The Policy&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;&lt;label for=&quot;cubes&quot; class=&quot;margin-toggle&quot;&gt;⊕&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;cubes&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img class=&quot;fullwidth&quot; src=&quot;/assets/img/ian-small.gif&quot; /&gt;&lt;br /&gt;“Your scientists were so
+preoccupied with whether or not they could, they didn’t stop to think if they
+should.” — Ian Malcom. The simulation above is from the work of [&lt;a href=&quot;https://arxiv.org/abs/1506.02438&quot;&gt;Schulman, &lt;em&gt;et
+al.&lt;/em&gt;, 2015&lt;/a&gt;].&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;Reinforcement learning is a branch of machine learning that answers the
+ambitious question: &lt;em&gt;How do we teach a machine to learn complex behaviors on
+its own, with limited supervision?&lt;/em&gt; While reinforcement learning, or RL, has
+been around in one form or another for decades, in the last few years it’s made
+remarkable strides and is having something of a renaissance.&lt;/p&gt;
+
+&lt;p&gt;Consider, as an example, the simulation to the right, which shows an autonomous
+spacecraft attempting to land between two flags on the lunar surface. The
+spacecraft is controlled by a neural network brain, which can take in various
+sensor readings subsequently fire the craft’s orientation engines or main
+thrusters. Its initial attempts are dismal: It careens wildly off-screen. It
+fires its thrusters haphazardly until it plows into the hard lunar soil. But
+after several iterations of its learning algorithm, we find it quite
+proficient: Not only does it land, but it does so deftly, and with panache.&lt;/p&gt;
+
+&lt;p&gt;This behavior was not hard-coded by a human programmer — the RL agent learned
+it through experience: by trying and failing and getting a little bit better
+after each attempt. The only supervision involved was the numerical reward
+signal the authors provided at each timestep to let the robot know how well it
+was doing. In this case, the reward is simply the forward velocity of the
+robot&lt;label for=&quot;actually&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;actually&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;Actually the reward signal is a slightly more
+complicated than that. In addition to the forward velocity, the authors add a
+couple small terms designed to penalize large torques and impact forces.
+Defining a reward signal for a problem is something of an art, and how to do it
+best remains an open research question. &lt;/span&gt;, the idea being that a properly
+walking robot should move faster than one flopping about on the ground. By
+slowly adapting its behavior in order to maximize some function of this reward,
+our bipedal friend learns how to coordinate its legs and arms in a complex and
+effective way. This ability to learn sophisticated behaviors with minimal
+oversight is among the great advantages of reinforcement learning.&lt;/p&gt;
+
+&lt;p&gt;But let’s be a bit more precise about what is happening here. At each timestep
+of the simulation, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;t&lt;/script&gt;&lt;/span&gt;, our robot takes an action, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;a_t&lt;/script&gt;&lt;/span&gt;,
+selected from its list of available actions according to some plan that depends
+on its currently observed state, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;s_t&lt;/script&gt;&lt;/span&gt;. For the bipedal robot above,
+actions correspond to the application of certain torques and forces to its ten
+different joints. The state is a 22-dimensional vector recording the position
+and motion of the robot’s head, trunk, and extremeties. After taking an action,
+the robot receives a numerical reward &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;r_{t}&lt;/script&gt;&lt;/span&gt;, and observes the next
+state, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;s_{t+1}&lt;/script&gt;&lt;/span&gt;. And so on.&lt;/p&gt;
+
+&lt;p&gt;The goal of RL is to learn to maximize the total cumulative reward, also known
+as the &lt;em&gt;return&lt;/em&gt;,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;R=\sum_{t=0}^{\infty} r_{t}&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;or something like it, by learning how to take the right action at the right
+time. Note that we’re maximizing the &lt;em&gt;cumulative&lt;/em&gt;, not instantaneous reward.
+We’re interested in the long game, not short-term gains; this means that we may
+often have to do something suboptimal in the short-term to better achieve our
+long-term goals&lt;label for=&quot;distal&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;distal&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;And this touches on one of the chief
+challenges of RL: How do we know how to value an action when it might not bear
+fruit until the distant future? This thorny issue is known, variously, as the
+&lt;em&gt;credit assignment&lt;/em&gt; or &lt;em&gt;distal reward&lt;/em&gt; problem.  &lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;There are a lot of ways to skin this cat, and RL now comprises many techniques,
+including Monte Carlo, dynamic programming, policy optimization methods, and
+endless variants thereof. Each method has its strengths, weaknesses, and
+domains of applicability.&lt;/p&gt;
+
+&lt;p&gt;In this article we explore the policy optimization approach, wherein our agent
+tries to directly learn the best policy, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\pi_\theta(a|s)&lt;/script&gt;&lt;/span&gt;. The policy
+is the overarching plan, the strategy. It’s how the agent answers the question,
+&lt;em&gt;what action should I take, given I find myself in this particular state?&lt;/em&gt;
+Think of it as the brain of the RL agent. More precisely, the policy tells us
+the likelihood that the agent should select an action, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;a&lt;/script&gt;&lt;/span&gt;, given it
+finds itself in a state, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;s&lt;/script&gt;&lt;/span&gt;&lt;label for=&quot;well&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;well&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;For a stochastic
+policy, that is — which is what we consider here. We could also work with
+deterministic policies, where the action is not sampled from a distribution,
+but is the direct output of some function. &lt;/span&gt;. The trick, or one of the tricks,
+anyway, is to somehow model this policy using a function approximator, then
+tinker with the approximation to increase the expected return.&lt;/p&gt;
+
+&lt;p&gt;Note the subscript, which indicates the likelihood depends on a parameter
+vector &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\theta&lt;/script&gt;&lt;/span&gt;, the meaning of which depends on how we model
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\pi_\theta&lt;/script&gt;&lt;/span&gt;. If we’re using a neural network, which is what we’ll
+be doing here, then &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\theta&lt;/script&gt;&lt;/span&gt; maps to the weights and biases of the
+network&lt;label for=&quot;itsbig&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;itsbig&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;The size of this parameter vector depends on the
+size of the neural networks used to model the policy, but is typically large,
+containing hundreds if not thousands of parameters. This is part of what makes
+RL, and so-called deep-RL, in particular, so theoretically challenging and
+computationally intensive. &lt;/span&gt;. In that case, the input to the network is the
+currently observed state vector, and its outputs are the probabilities of
+taking the next actions, which actions may be discrete or, as in the case of
+the bipedal robot, continuous. But much more on all that later. However we
+decide to model it, our goal is to somehow iteratively tweak &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\theta&lt;/script&gt;&lt;/span&gt;
+so that &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\pi_\theta&lt;/script&gt;&lt;/span&gt; produces the largest expected return. As we’ll
+see, some tweaks are better than others.&lt;/p&gt;
+
+&lt;p&gt;This article divides into three parts: &lt;a href=&quot;#part-i-fundamentals&quot;&gt;Part I&lt;/a&gt; defines
+the problem a bit more formally and introduces the simple RL problem we will
+use as an example thoughout; &lt;a href=&quot;#part-ii-trust-region-policy-optimization&quot;&gt;Part
+II&lt;/a&gt; walks through an iterative
+method for optimizing the policy known as Trust Region Policy Optimization,
+which can efficiently solve a variety of RL problems; finally, &lt;a href=&quot;#part-iii-implementation&quot;&gt;Part
+III&lt;/a&gt; shows how to practically implement the algorithm
+using the &lt;a href=&quot;http://tensorflow.org&quot;&gt;tensorflow&lt;/a&gt; framework.&lt;/p&gt;
+
+&lt;p&gt;Although we strive to be self-contained, we must assume the following of our
+intrepid reader: she is unafraid of linear algebra and vector calculus; she can
+compute gradients of multivariate functions for the purposes of optimization;
+she is familiar with basic probability theory; and she has fiddled, at least a
+bit, with simple neural networks of the multilayer perceptron variety. That
+said, as we sail forth we’ll recommend reviews and tutorials as necessary to
+help the despondent traveler.&lt;/p&gt;
+
+&lt;h2 id=&quot;resources-and-references&quot;&gt;Resources and References&lt;/h2&gt;
+
+&lt;p&gt;Excellent resources for learning about reinforcement learning abound. RL’s
+foundational text is arguably Barto &amp;amp; Sutton’s &lt;a href=&quot;https://goo.gl/BsydRB&quot;&gt;Reinforcement Learning: An
+Introduction&lt;/a&gt;, which provides an historical overview of
+the problem, an introduction to the fundamentals of temporal difference
+learning, Q-learning, and much more. David Silver’s &lt;a href=&quot;http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html&quot;&gt;notes from his
+lectures&lt;/a&gt; at
+University College London provide an up-to-date perspective on these topics,
+and their modern extensions. John Schulman’s &lt;a href=&quot;https://www.youtube.com/watch?v=2pWv7GOvuf0video&quot;&gt;Introduction to Reinforcement
+Learning&lt;/a&gt; lectures provide
+insights into many of the topics that we will discuss in this article, with an
+emphasis on Deep Reinforcement Learning.&lt;/p&gt;
+
+&lt;p&gt;Indeed, the algorithms discussed here are based on two papers by Schulman and
+friends. The first is &lt;a href=&quot;https://arxiv.org/abs/1502.05477&quot;&gt;Trust Region Policy
+Optimization&lt;/a&gt;, which introduces a practical
+method for robustly and efficiently solving the policy gradient problem. The
+second is &lt;a href=&quot;https://arxiv.org/abs/1506.02438&quot;&gt;High-Dimensional Continuous Control Using Generalized Advantage
+Estimation&lt;/a&gt;, which shows how to use
+parameterized value functions to reduce the variance of policy gradient
+estimates while limiting the introduction of bias, and which technique,
+incidentally, was used to train our introductory lunar lander and bipedal
+walker. If none of this makes sense, well, read on, as these are the sorts of
+things we mean to clarify.&lt;/p&gt;
+
+&lt;p&gt;Finally, the algorithms we develop in this article are available on
+&lt;a href=&quot;http://www.github.com/lightscalar/dopamine&quot;&gt;Github&lt;/a&gt; for all your policy
+gradient optimizing needs.&lt;/p&gt;
+
+&lt;h1 id=&quot;part-i-fundamentals&quot;&gt;Part I: Fundamentals&lt;/h1&gt;
+
+&lt;h2 id=&quot;markov-decision-processes&quot;&gt;Markov Decision Processes&lt;/h2&gt;
+
+&lt;p&gt;Before we talk in any detail about policy optimization, we need to more
+formally introduce the notion of a &lt;em&gt;Markov Decision Process&lt;/em&gt;, or MDP, which is
+the mathematical language natural to reinforcement learning. MDPs comprise five
+major components: 1) a set of states, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\mathcal{S}&lt;/script&gt;&lt;/span&gt;, that our system
+could be in; 2) a set of allowable actions, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\mathcal{A}&lt;/script&gt;&lt;/span&gt;&lt;label for=&quot;discrete-or-continuous&quot; class=&quot;margin-toggle&quot;&gt; ⊕&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;discrete-or-continuous&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;marginnote&quot;&gt;These sets of actions and states could be discrete or
+continuous, depending on the problem. For what we’re doing here, they’ll be
+continuous. &lt;/span&gt;; 3) a model of system dynamics, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;T(s_{t+1}|s_t, a_t)&lt;/script&gt;&lt;/span&gt;,
+which tells us the probability of transitioning from one state to the next
+given we’ve taken some action; 4) a scalar reward function, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;r(s_t, a_t,
+s_{t+1}) \in \mathbb{R}&lt;/script&gt;&lt;/span&gt;; and, finally, 5) some way to select the starting
+state, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;s_0&lt;/script&gt;&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let’s consider that fifth element first, because, well, before anything else
+can happen, we must know the initial state of our MDP. For some scenarios,
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;s_0&lt;/script&gt;&lt;/span&gt; is deterministic — a chess board, for example, is always in the
+same state at the beginning of a game. For other scenarios, the starting state
+may be different every time, as when training an autonomous vehicle to drive
+through a city — every training episode will look different, with different
+cars, traffic patterns and densities, etc. In that case, we draw our initial
+state from a probability distribution, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\rho_0&lt;/script&gt;&lt;/span&gt;, which may be some
+known distribution over the parameters of our environment, if we’re simulating
+it in a computer, or may be realized by the real world itself.&lt;/p&gt;
+
+&lt;p&gt;The set of states in an MDP, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\mathcal{S}&lt;/script&gt;&lt;/span&gt;, must have the so-called
+&lt;em&gt;Markov Property&lt;/em&gt;, by which we mean the system dynamics depend only on the
+current state, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;s_t&lt;/script&gt;&lt;/span&gt;, and not on any prior states, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;s_0, s_1, ...,
+s_{t-1}&lt;/script&gt;&lt;/span&gt;. In practice, this is not a stringent requirement. If we
+find our system depends on the last two states, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;s_{t-1}&lt;/script&gt;&lt;/span&gt; and
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;s_t&lt;/script&gt;&lt;/span&gt;, for example, we can simply concatenate these to form a new
+state, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;s_t^\prime = \text{concat}(s_t, s_{t-1})&lt;/script&gt;&lt;/span&gt;, which does satisfy
+the Markov property.&lt;/p&gt;
+
+&lt;p&gt;However we find ourselves in state &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;s_0&lt;/script&gt;&lt;/span&gt;, the next thing we do is take
+some action &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;a_0&lt;/script&gt;&lt;/span&gt;, and thereby transition to the state
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;s_{1}&lt;/script&gt;&lt;/span&gt;, according to some probabilistic transition model,
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;s_{t+1} \sim T(s_{t+1}|s_t, a_t)&lt;/script&gt;&lt;/span&gt;&lt;label for=&quot;tilde&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;tilde&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;The ~ symbol
+here means &lt;em&gt;is distributed as&lt;/em&gt;, by which we mean the quantity on the left of
+the ~ is randomly sampled from the probability distribution on its right. &lt;/span&gt;.
+For all this effort we receive a scalar reward, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;r_0 \in \mathbb{R}&lt;/script&gt;&lt;/span&gt;.
+By repeating this process, we construct a &lt;em&gt;trajectory&lt;/em&gt;, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;(s_0, a_0, r_0,
+s_1, a_1, ...)&lt;/script&gt;&lt;/span&gt;. The classic Markov Decision Process is illustrated below.&lt;/p&gt;
+
+&lt;figure&gt;&lt;figcaption&gt;&lt;/figcaption&gt;&lt;img src=&quot;/assets/img/mdp.png&quot; /&gt;&lt;/figure&gt;
+
+&lt;p&gt;The transition dynamics&lt;label for=&quot;needtoknow&quot; class=&quot;margin-toggle&quot;&gt; ⊕&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;needtoknow&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;marginnote&quot;&gt;For RL, we do not
+necessarily need to have a model of the system dynamics. The agent can simply
+take an action, let the system evolve, and observe the resulting state and
+reward. It need not have a detailed model of its environment and how it
+interacts with it; this is known as model-free RL. Having a model can help
+accelerate learning in some cases, but because models are usually only
+approximations to what is really going on, it is often difficult to reliably
+train model-based RL agents. This tension between model-free and model-based RL
+is the source of much new research these days. &lt;/span&gt; &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;T(s_{t+1}|s_t,
+a_t)&lt;/script&gt;&lt;/span&gt; might be modeled by a computer simulation, as for the lunar lander
+animated above, or, in the case of a physical robot, by the actual physics
+governing our Universe. Either way, we keep sampling our trajectory until a
+terminal state is reached, which, depending on what we’re trying to accomplish,
+could happen after we’ve observed a preordained number of timesteps, when our
+robot falls over, or after our game is lost or won. The trajectory that results
+from these efforts constitutes an &lt;em&gt;episode&lt;/em&gt;&lt;label for=&quot;epsiodes&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;epsiodes&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;Of course,
+not all RL scenarios are episodic, having a well defined beginning and end.
+Scenarios such as stock trading or natural language processing may be
+continuous. For the most part, the methods discussed here can be adapted to
+continuous scenarios with little trouble. &lt;/span&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-policy&quot;&gt;The Policy&lt;/h2&gt;
+
+&lt;p&gt;One thing we’ve not discussed is how to select an action at each timestep. As
+mentioned in the introduction, this is the job of the policy, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\pi&lt;/script&gt;&lt;/span&gt;.
+The policy is the overarching strategy or plan. It tells our agent how to act
+when it finds itself in a certain state. Solving an MDP means finding the
+policy &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\pi&lt;/script&gt;&lt;/span&gt; that maximizes the expected return, or some function
+thereof. The policy could be deterministic, in which case the action is the
+output of a function of the current state, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;a_t = \pi(s_t)&lt;/script&gt;&lt;/span&gt;; or
+stochastic, wherein the action is sampled from a probability distribution
+conditioned on the current state, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;a_t \sim \pi(a_t|s_t)&lt;/script&gt;&lt;/span&gt;. Here we
+focus on stochastic policies.&lt;/p&gt;
+
+&lt;p&gt;Before we can do anything, however, we have to somehow realize our policy; that
+is, we must represent it mathematically. Because we do not &lt;em&gt;a priori&lt;/em&gt; know
+what policy is best, we’ll need a flexible representation we can modify as we
+go along.&lt;/p&gt;
+
+&lt;p&gt;There are many sensible ways to approximate functions&lt;label for=&quot;funcapprox&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;funcapprox&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;For an nice overview of function approximation in the context of RL, see
+Chapter 8 of &lt;a href=&quot;https://goo.gl/BsydRB&quot;&gt;Barto and Sutton&lt;/a&gt;, or David Silver’s
+&lt;a href=&quot;http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching_files/FA.pdf&quot;&gt;sixth
+lecture&lt;/a&gt;
+. &lt;/span&gt;. For our purposes, we will use &lt;a href=&quot;https://en.wikipedia.org/wiki/Multilayer_perceptron&quot;&gt;multilayer
+perceptrons&lt;/a&gt; (MLPs)&lt;label for=&quot;neuralnets&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;neuralnets&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;New to neural networks? Two great tutorials are
+available &lt;a href=&quot;http://neuralnetworksanddeeplearning.com/about.html&quot;&gt;here&lt;/a&gt; and
+&lt;a href=&quot;http://cs231n.github.io/neural-networks-case-study/&quot;&gt;here&lt;/a&gt;. &lt;/span&gt;. MLPs are
+feed-forward artificial neural networks capable of representing complex,
+nonlinear functions. Despite their power, they are quite simple mathematically.
+Think of an MLP as a fancy function, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt;&lt;/span&gt;, a machine that takes in
+vector-valued input, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;x\in\mathbb{R}^n&lt;/script&gt;&lt;/span&gt;, transforms it in some way,
+and returns vector-valued output, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;y\in\mathbb{R}^k&lt;/script&gt;&lt;/span&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;y = f(x)&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;To be a little more concrete, let’s walk through a quick example of using an
+MLP to implement a policy. Suppose the state space of our MDP is
+four-dimensional, and we have two different continuous actions that we can take
+at each time instant. Then we could implement the policy using something like
+the neural network illustrated below:&lt;/p&gt;
+
+&lt;figure&gt;&lt;figcaption&gt;A multilayer perceptron. This
+artificial neural network converts a four-dimensional input (the four red
+circles at the bottom) into a two-dimensional output (green circles at the
+top), by way of a hidden-layer containing eight neurons (gray circles in the
+middle). Each line connecting two nodes represents a network weight — an
+element of one of the network's two connection matrices.&lt;/figcaption&gt;&lt;img src=&quot;/assets/img/neural-network@2x.png&quot; /&gt;&lt;/figure&gt;
+
+&lt;p&gt;The red circles at the lowest level represent the numerical inputs to this
+network (here four, the dimension of our state space), which we represent
+mathematically as a &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;(1 \times 4)&lt;/script&gt;&lt;/span&gt; dimensional matrix, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;x=[x_1,
+x_2, x_3, x_4]&lt;/script&gt;&lt;/span&gt;. These inputs are propagated into the hidden layer of the
+network by multiplying by a &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;(4\times 8)&lt;/script&gt;&lt;/span&gt; dimensional connection
+matrix, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;W_1&lt;/script&gt;&lt;/span&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;z_1 = xW_1&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;Note that the &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;8&lt;/script&gt;&lt;/span&gt; comes about because we happen to have eight neurons
+(or nodes) in our hidden layer. In practice, depending on the complexity of the
+problem we’re trying to address, we might have dozens or hundreds of neurons
+per hidden layer. In this case, the result is a &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;(1 \times 8)&lt;/script&gt;&lt;/span&gt;
+dimensional matrix, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;z_1&lt;/script&gt;&lt;/span&gt;, which is the raw output of the middle
+layer, to which we next apply the so-called activation function,
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\sigma_1&lt;/script&gt;&lt;/span&gt;, to obtain the output of the hidden layer:&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;h_1 = \sigma_1(z_1) = \sigma_1(xW_1)&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;There are many possible choices for the activation function. While a &lt;a href=&quot;https://en.wikipedia.org/wiki/Activation_function&quot;&gt;full
+discussion&lt;/a&gt; is beyond the
+scope of this article, popular choices include
+&lt;a href=&quot;https://en.wikipedia.org/wiki/Sigmoid_function&quot;&gt;sigmoid&lt;/a&gt;, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\tanh&lt;/script&gt;&lt;/span&gt;,
+and &lt;a href=&quot;https://en.wikipedia.org/wiki/Rectifier_(neural_networks)&quot;&gt;RELU&lt;/a&gt;
+operations. Different activation functions offer different levels of
+performance on different problems, but their inclusion is non-negotiable: they
+introduce critical nonlinearities that allow neural networks, in principle at
+least, to approximate any function&lt;label for=&quot;nonlinearities&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;nonlinearities&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;Sans nonlinear
+activations, the output of the neural network becomes a simple matrix
+multiplication of its input; the problem thereby reduces to one of linear
+regression — which may be fine, but we will generally want to be able to
+express more complicated relationships. &lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;Finally, the output of the hidden layer is propagated to the output of the
+network via another matrix multiplication, and the application of a second
+activation function (which need not be the same as the first):&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;y = \sigma_2(z_2) = \sigma_2(h_1W_2) =
+\sigma_2(\sigma_1(xW_1)W_2) \tag{1}&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;(8 \times 2)&lt;/script&gt;&lt;/span&gt;-sized matrix &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;W_2&lt;/script&gt;&lt;/span&gt; ensures that the output
+of the network is just two numbers, represented by a &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;(1 \times
+2)&lt;/script&gt;&lt;/span&gt;-dimensional matrix. And that’s it: we’ve implemented a policy using a
+neural network! Given a state, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;s_t\in\mathbb{R}^4&lt;/script&gt;&lt;/span&gt;, we can process it
+using our network via Eq. 1, with &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;x = s_t&lt;/script&gt;&lt;/span&gt;, to produce an output,
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;Now, how do we interpret &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;&lt;/span&gt;? How does it correspond to the stochastic
+policy we’ve been discussing? It depends on how we’re modeling the underlying
+probability distribution from which we’re drawing our actions. A popular choice
+for continuous action spaces is to model the policy as a
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;K&lt;/script&gt;&lt;/span&gt;-dimensional Gaussian with a fixed (generally diagonal) covariance,
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\Sigma&lt;/script&gt;&lt;/span&gt;. In that case, we interpret the output of the network as the
+mean of this distribution. To be completely explicit, our action is drawn from
+a &lt;a href=&quot;https://en.wikipedia.org/wiki/Multivariate_normal_distribution&quot;&gt;multivariate
+normal&lt;/a&gt;
+distribution,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;a_t \sim \mathcal{N}(y_t, \Sigma) \tag{2}&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;where,&lt;/p&gt;
+
+&lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;y_t = \sigma_2(\sigma_1(s_tW_1)W_2)&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;At each timestep, we propagate the &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;s_t&lt;/script&gt;&lt;/span&gt; through the MLP to obtain a
+mean action vector, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;y_t&lt;/script&gt;&lt;/span&gt;; we draw an action from a normal
+distribution with this mean according to Eq. 2; we take that action; we observe
+our new state and reward; and on and on.&lt;/p&gt;
+
+&lt;p&gt;So we’re done, except for the small matter of finding the right policy. We’ve
+not said much about those weight matrices, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;W_1&lt;/script&gt;&lt;/span&gt;, and &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;W_2&lt;/script&gt;&lt;/span&gt;.
+The matrices comprise the &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;(4 \times 8) + (8 \times 2) = 48&lt;/script&gt;&lt;/span&gt;
+parameters of our network, and therefore define our policy. For convenience,
+rather than referring to the &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;W_1&lt;/script&gt;&lt;/span&gt; and the &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;W_2&lt;/script&gt;&lt;/span&gt; parameters
+separately, we will denote the full set of parameters specifying the network as
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\theta&lt;/script&gt;&lt;/span&gt;; you can regard &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\theta&lt;/script&gt;&lt;/span&gt; as the concatenation of all
+the elements of the weight matrices into one long vector and, indeed, when we
+actually implement these algorithms, this is exactly what we will do, for the
+sake of computational convenience and efficiency. For this example, then,
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\theta \in \mathbb{R}^{48}&lt;/script&gt;&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;We can now talk meaningfully about our &lt;em&gt;parameterized&lt;/em&gt; policy,
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\pi_\theta&lt;/script&gt;&lt;/span&gt;, where the subscript indicates that the policy depends on
+(in the example here) a list of 48 numbers. Before training,
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\theta&lt;/script&gt;&lt;/span&gt; is typically initialized to random numbers near zero, a
+choice that will not, in general, yield an optimal policy. The goal of policy
+optimization is to somehow change &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\theta&lt;/script&gt;&lt;/span&gt; in response to states
+observed, actions taken, and rewards received, so that the policy ultimately
+performs well — in the sense that it generates a good return.&lt;/p&gt;
+
+&lt;p&gt;But before we wade into those deep waters, a brief interlude: let’s introduce
+an example problem that will help make our discussion more concrete. While we
+could use an impressively difficult problem as our example, such scenarios are
+unnecessarily complicated when we’re trying to learn the basics, and can take a
+&lt;em&gt;long time&lt;/em&gt; to train and simulate. So we’ll focus instead on a dead simple
+scenario, which can be trained in just a few minutes on a mediocre
+laptop&lt;label for=&quot;restassured&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;restassured&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;We should rest assured, however, that the
+methods introduced here are applicable to more complex, real-world
+problems. &lt;/span&gt;.&lt;/p&gt;
+
+&lt;h1 id=&quot;part-ii-trust-region-policy-optimization&quot;&gt;Part II: Trust Region Policy Optimization&lt;/h1&gt;
+
+&lt;p&gt;The problem of teaching a machine to learn an optimal policy is frustrated by
+the long delay between actions and their positive or negative influence on
+rewards. This is known as the credit assignment problem&lt;label for=&quot;distal_note&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;distal_note&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;In the behavioral psychology literature, this is the notorious &lt;a href=&quot;https://goo.gl/pI8Ls4&quot;&gt;distal
+reward&lt;/a&gt; problem. &lt;/span&gt;.&lt;/p&gt;
+
+&lt;h1 id=&quot;part-iii-implementation&quot;&gt;Part III: Implementation&lt;/h1&gt;
+
+&lt;p&gt;So, how to implement TRPO efficiently?&lt;/p&gt;
+</description>
+        <pubDate>Tue, 06 Jun 2017 00:00:00 -0400</pubDate>
+        <link>http://localhost:4000/articles/17/introduction-to-policy-optimization</link>
+        <guid isPermaLink="true">http://localhost:4000/articles/17/introduction-to-policy-optimization</guid>
+        
+        
+        <category>drafts</category>
+        
+      </item>
     
       <item>
         <title>How Much Water Can You Pour Into a Tesseract?</title>
@@ -15,7 +758,8 @@
 
 &lt;h2 id=&quot;the-red-box&quot;&gt;The Red Box.&lt;/h2&gt;
 
-&lt;p&gt;&lt;label for=&quot;cubes&quot; class=&quot;margin-toggle&quot;&gt;⊕&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;cubes&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img class=&quot;fullwidth&quot; src=&quot;/assets/img/artists_conception.png&quot; /&gt;&lt;br /&gt;An artist’s conception of the two boxes now on your kitchen table.&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;label for=&quot;cubes&quot; class=&quot;margin-toggle&quot;&gt;⊕&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;cubes&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img class=&quot;fullwidth&quot; src=&quot;/assets/img/artists_conception.png&quot; /&gt;&lt;br /&gt;An artist’s
+conception of the two boxes now on your kitchen table.&lt;/span&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;span class=&quot;newthought&quot;&gt;Two empty boxes&lt;/span&gt;  now sit on your kitchen table. The one on
 the left is red, the one on the right is blue, but near as you can tell they’re
@@ -48,7 +792,8 @@ does not double its volume, but rather increases it by a factor of
 tons, or more than &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;17{,}000&lt;/script&gt;&lt;/span&gt; lbs, and would require
 &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;2{,}000&lt;/script&gt;&lt;/span&gt; two liter bottles to fill it. This is now starting to be a
 structural issue for your kitchen table, your kitchen, and possibly your
-marriage&lt;label for=&quot;marriage&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;marriage&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;Hence we will perform this experiment only in our minds. &lt;/span&gt;.&lt;/p&gt;
+marriage&lt;label for=&quot;marriage&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;marriage&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;sidenote&quot;&gt;Hence we will perform this experiment only in
+our minds. &lt;/span&gt;.&lt;/p&gt;
 
 &lt;p&gt;That three in &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;2^3&lt;/script&gt;&lt;/span&gt; comes about because the red cube resides in three
 spatial dimensions. The volume of a cube with edge length &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;L&lt;/script&gt;&lt;/span&gt; is given
@@ -101,7 +846,10 @@ three-dimensional cube. It is to a cube what a cube is to a square, what a
 square is to a line segment, or what a line segment is to a point. The figure
 below may or may not help you make sense of this.&lt;/p&gt;
 
-&lt;figure&gt;&lt;figcaption&gt;From a point to a tesseract. A one-dimensional cube is two “parallel” points connected by a line segment. A square is formed by connecting two parallel line segments, a cube by connecting two parallel squares. A tesseract, then, is simply two parallel cubes.&lt;/figcaption&gt;&lt;img src=&quot;/assets/img/building_a_tesseract.png&quot; /&gt;&lt;/figure&gt;
+&lt;figure&gt;&lt;figcaption&gt;From a point to a
+tesseract. A one-dimensional cube is two “parallel” points connected by a
+line segment. A square is formed by connecting two parallel line segments, a cube by connecting two parallel squares. A tesseract, then, is simply two
+parallel cubes.&lt;/figcaption&gt;&lt;img src=&quot;/assets/img/building_a_tesseract.png&quot; /&gt;&lt;/figure&gt;
 
 &lt;p&gt;We begin, simply enough, on the far left, with a single point,
 an object of zero dimension. We can think of it as a zero-dimensional cube. To
@@ -144,7 +892,9 @@ molecule at all but, like proper physicists, treat the water molecules as
 spheres. From here on out, we’ll think of the water molecules as hard spherical
 masses with a fixed radius, R, as illustrated in the diagram below.&lt;/p&gt;
 
-&lt;figure&gt;&lt;figcaption&gt;Water consists of two hydrogen atoms and one oxygen atom, but like proper physicists, we’ll assume each water molecule is just a hard sphere with a fixed radius.&lt;/figcaption&gt;&lt;img src=&quot;/assets/img/chemistry_is_hard.png&quot; /&gt;&lt;/figure&gt;
+&lt;figure&gt;&lt;figcaption&gt;Water consists of two
+hydrogen atoms and one oxygen atom, but like proper physicists, we’ll assume
+each water molecule is just a hard sphere with a fixed radius.&lt;/figcaption&gt;&lt;img src=&quot;/assets/img/chemistry_is_hard.png&quot; /&gt;&lt;/figure&gt;
 
 &lt;p&gt;In three dimensions, the position of every water molecule is specified by three
 coordinates. Molecule &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;i&lt;/script&gt;&lt;/span&gt;, for example, can be found at position
@@ -157,12 +907,14 @@ collide with the first if the following is true:&lt;/p&gt;
 Distance&lt;/a&gt; between their
 centers is less than twice their common radius.&lt;/p&gt;
 
-&lt;figure&gt;&lt;figcaption&gt;Two spherical water molecules will collide if their centers are separated by twice their common radius, independent of how many dimensions they inhabit.&lt;/figcaption&gt;&lt;img src=&quot;/assets/img/water_collision.png&quot; /&gt;&lt;/figure&gt;
+&lt;figure&gt;&lt;figcaption&gt;Two spherical water molecules
+will collide if their centers are separated by twice their common radius,
+independent of how many dimensions they inhabit.&lt;/figcaption&gt;&lt;img src=&quot;/assets/img/water_collision.png&quot; /&gt;&lt;/figure&gt;
 
 &lt;p&gt;Thinking about water in this way is useful because we can readily segue to four
 dimensions. In that case — inside the tesseract, for example — we must specify
-four coordinates, not three; &lt;em&gt;i.e.&lt;/em&gt;, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\mathbf{r}_i = (x_i, y_i, z_i, w_i)&lt;/script&gt;&lt;/span&gt;.
-And now collision between two molecules occurs if,&lt;/p&gt;
+four coordinates, not three; &lt;em&gt;i.e.&lt;/em&gt;, &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;\mathbf{r}_i = (x_i, y_i, z_i,
+w_i)&lt;/script&gt;&lt;/span&gt;.  And now collision between two molecules occurs if,&lt;/p&gt;
 
 &lt;div class=&quot;mathblock&quot;&gt;&lt;script type=&quot;math/tex; mode=display&quot;&gt;(x_i-x_j)^2+(y_i-y_j)^2+(z_i-z_j)^2 + (w_i-w_j)^2 \le
 (2R)^2\tag{3}&lt;/script&gt;&lt;/div&gt;
@@ -185,7 +937,12 @@ into how the underlying physics is thereby perturbed. But we shall not be
 heading down those rabbit holes here. We will focus exclusively on on the
 geometry of the problem.&lt;/p&gt;
 
-&lt;p&gt;&lt;label for=&quot;mole&quot; class=&quot;margin-toggle&quot;&gt; ⊕&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;mole&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;marginnote&quot;&gt;Recall that a mole is a unit of measurement corresponding to the number of representative particles in a chemical substance equal to the number of atoms in 12 grams of Carbon-12. That number is known as Avogadro’s constant, which has a value of just over 602 sextillion mol&lt;sup&gt;-1&lt;/sup&gt;; you can regard it as a conversion factor of sorts between the atomic and macroscopic worlds. &lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;label for=&quot;mole&quot; class=&quot;margin-toggle&quot;&gt; ⊕&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;mole&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;marginnote&quot;&gt;Recall that a mole is a unit of measurement corresponding
+to the number of representative particles in a chemical substance equal to the
+number of atoms in 12 grams of Carbon-12. That number is known as Avogadro’s
+constant, which has a value of just over 602 sextillion mol&lt;sup&gt;-1&lt;/sup&gt;; you
+can regard it as a conversion factor of sorts between the atomic and
+macroscopic worlds. &lt;/span&gt;&lt;/p&gt;
 
 &lt;p&gt;In that case, here is all the chemistry we’ll need. The effective radius of a
 water molecule is about &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;0.135&lt;/script&gt;&lt;/span&gt; nm. It has a mass of 0.018 kg/mole,
@@ -228,7 +985,11 @@ constituent particles. The packing fraction of water is therefore &lt;span&gt;�
 dense than liquid water, has a packing fraction on the order of
 &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;10^{-8}&lt;/script&gt;&lt;/span&gt;.&lt;/p&gt;
 
-&lt;p&gt;&lt;label for=&quot;bicker&quot; class=&quot;margin-toggle&quot;&gt; ⊕&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;bicker&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;marginnote&quot;&gt;One may find slightly different values for the effective radius of water kicking around in the literature. Do not let this ruin your day; a slightly different effective radius implies a slightly different packing fraction in order to obtain the observed density. More important is the order of magnitude of the quantities involved. &lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;label for=&quot;bicker&quot; class=&quot;margin-toggle&quot;&gt; ⊕&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;bicker&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;marginnote&quot;&gt;One may find slightly different values for the
+effective radius of water kicking around in the literature. Do not let this
+ruin your day; a slightly different effective radius implies a slightly
+different packing fraction in order to obtain the observed density. More
+important is the order of magnitude of the quantities involved. &lt;/span&gt;&lt;/p&gt;
 
 &lt;p&gt;We may write down a relation for the total number of molecules that can be
 stored in a box of given volume in terms of the specific volume of the
@@ -255,7 +1016,9 @@ devices and subject to various constraints, manage to arrange themselves.&lt;/p&
 &lt;p&gt;The illustration below shows two different packings of 2-D spheres in the
 plane, so: &lt;em&gt;circle packing&lt;/em&gt;.&lt;/p&gt;
 
-&lt;figure&gt;&lt;figcaption&gt;Two different circle packings. On the left, square packing leads to a packing ratio of 79%. On the right, the provably optimal hexagonal packing leads to a ratio of 91%.&lt;/figcaption&gt;&lt;img src=&quot;/assets/img/circle_packing.png&quot; /&gt;&lt;/figure&gt;
+&lt;figure&gt;&lt;figcaption&gt;Two different circle packings.
+On the left, square packing leads to a packing ratio of 79%. On the right, the
+provably optimal hexagonal packing leads to a ratio of 91%.&lt;/figcaption&gt;&lt;img src=&quot;/assets/img/circle_packing.png&quot; /&gt;&lt;/figure&gt;
 
 &lt;p&gt;The arrangement on the left, known as a square packing because the circle
 centers are arranged in a square, has circles occupying 79% of the plane.  The
@@ -361,13 +1124,43 @@ to the reader to calculate the details, but it would exceed &lt;span&gt;​&lt;s
 &lt;p&gt;On your now very distressed kitchen table.&lt;/p&gt;
 </description>
         <pubDate>Mon, 24 Apr 2017 00:00:00 -0400</pubDate>
-        <link>/articles/17/how-much-water-can-you-store-in-a-tesseract</link>
-        <guid isPermaLink="true">/articles/17/how-much-water-can-you-store-in-a-tesseract</guid>
+        <link>http://localhost:4000/articles/17/how-much-water-can-you-store-in-a-tesseract</link>
+        <guid isPermaLink="true">http://localhost:4000/articles/17/how-much-water-can-you-store-in-a-tesseract</guid>
         
         
         <category>physics</category>
         
         <category>math</category>
+        
+      </item>
+    
+      <item>
+        <title>Information Geometry</title>
+        <description>&lt;p&gt;z–
+layout: post
+title:  A Brief Introduction to Information Geometry.
+date:   2017-06-05
+categories: reinforcement_learning
+—&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2 id=&quot;flipping-a-biased-coin&quot;&gt;Flipping a Biased Coin&lt;/h2&gt;
+
+&lt;p&gt;&lt;label for=&quot;cubes&quot; class=&quot;margin-toggle&quot;&gt;⊕&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;cubes&quot; class=&quot;margin-toggle&quot; /&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img class=&quot;fullwidth&quot; src=&quot;/assets/img/biased_coin.png&quot; /&gt;&lt;br /&gt;A biased coin. Such a thing does &lt;a href=&quot;http://www.stat.columbia.edu/~gelman/research/published/diceRev2.pdf&quot;&gt;not actually exist&lt;/a&gt;, but let’s suspend our disbelief for the duration of this discussion.&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;I have handed you a biased coin. The coin has an unknown probability,
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;p&lt;/script&gt;&lt;/span&gt;, of coming up &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;H=\text{HEADS}&lt;/script&gt;&lt;/span&gt;, and probability
+&lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;(1-p)&lt;/script&gt;&lt;/span&gt; of coming up &lt;span&gt;​&lt;script type=&quot;math/tex&quot;&gt;T=\text{TAILS}&lt;/script&gt;&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;We humans have a natural inclination to learn. Even the dullest among us, at an
+early age…&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 17 Apr 2017 00:00:00 -0400</pubDate>
+        <link>http://localhost:4000/articles/17/information-geometry</link>
+        <guid isPermaLink="true">http://localhost:4000/articles/17/information-geometry</guid>
+        
         
       </item>
     
